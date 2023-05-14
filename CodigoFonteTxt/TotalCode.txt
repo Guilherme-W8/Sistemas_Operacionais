@@ -1,0 +1,272 @@
+#include <cstdlib>
+#include <iostream>
+#include <list>
+
+using namespace std;
+
+void first_Fit(int particoesMemoria[], int processo[], int tamanhoMemoriaParticao, int quantidadeProcesso) {
+    bool isProcessoAlocado[tamanhoMemoriaParticao];
+    for (int i = 0; i < tamanhoMemoriaParticao; i++) {
+        isProcessoAlocado[i] = true;
+    }
+
+    for (int i = 0; i < quantidadeProcesso; i++) {
+        int processoAlocado = 0;
+
+        for (int t = 0; t < tamanhoMemoriaParticao; t++) {
+            if (processo[i] > particoesMemoria[t]) {
+                processoAlocado++;
+            }
+        }
+
+        for (int j = tamanhoMemoriaParticao - 1; j >= 0; j--) {
+            if (processoAlocado == tamanhoMemoriaParticao) {
+                cout << "Processo { " << (i + 1) << " } { " << processo[i] << " } maior que qualquer particao de particoesMemoria." << endl;
+                break;
+            } else {
+                if (particoesMemoria[j] > processo[i] && isProcessoAlocado[j]) {
+                    cout << "Processo {" << (i + 1) << " } --> " << processo[i] << " --> Particao { " << particoesMemoria[j] << " }" << endl;
+                    isProcessoAlocado[j] = false;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void best_Fit(int particoesMemoria[], int processo[], int tamanhoMemoriaParticao, int quantidadeProcesso){
+	
+	/*  Bloco responsavel por armazenar se a particao de particoesMemoria esta sendo utilizada por 
+		um processo ou nao.*/
+	
+	bool isProcessoAlocado[tamanhoMemoriaParticao];		
+	for(int i = 0; i < tamanhoMemoriaParticao; i++){
+		isProcessoAlocado[i] = true;
+	}
+	
+	/*
+		For J diz a respeito dos processo
+		For I-1 diz a respeito das memorias
+		variavel processoAlocado salva se o processo é maior do que qualquer espaco na particoesMemoria
+		*/
+		
+				
+	for(int j = 0; j < quantidadeProcesso; j++){
+		list<int> listaOrganizadora;
+		int aux = 0;
+		bool processoAlocado = false;
+		
+		for(int i = 0; i < tamanhoMemoriaParticao; i++){
+			
+			if(processo[j] > particoesMemoria[i]){
+				aux++;
+			}
+			
+			if(particoesMemoria[i] >= processo[j] && isProcessoAlocado[i] == true){
+					listaOrganizadora.push_front(particoesMemoria[i]);
+				}
+			}
+			
+			if(aux == tamanhoMemoriaParticao){
+				processoAlocado = true;
+			}
+			
+		int lowestValue = listaOrganizadora.front();
+		int vetorOrganizador[listaOrganizadora.size()];
+		int auxiliarIterator = 0;
+		
+		
+		if(processoAlocado == false){
+		cout << "============= Processo >> " << processo[j] << " << Opcoes de particoes abaixo =============";
+		
+		
+		//Bloco responsavel por pegar o menor valor que o bloco perde ao processo entrar.				
+		for (list<int>::iterator it = listaOrganizadora.begin(); it != listaOrganizadora.end(); it++) {
+        	vetorOrganizador[auxiliarIterator] = *it;
+        	auxiliarIterator++;
+			
+        	if(lowestValue > *it){
+        		lowestValue = *it;
+			}
+    	}
+    	
+		cout << "\n";
+		
+		for(int i = 0; i < listaOrganizadora.size(); i++){
+    		cout << " " << vetorOrganizador[i] << endl;
+		}
+    	
+    			cout << "=========================================================================" << endl;
+    		
+				cout << "\n     " << "Processo: " << processo[j] << " --> " << lowestValue;
+				cout << "\n" << endl;	
+			}else{
+				cout << "\n   <<< ERROR: Processo { " << processo[j] << " } maior que qualquer unidade de particao >>>";
+				cout << "\n" << endl;	
+			}
+			
+			for(int w = 0; w < tamanhoMemoriaParticao; w++){
+				if(lowestValue == particoesMemoria[w] && isProcessoAlocado[w] == true){
+					cout << "     Particao: " << particoesMemoria[w] << "kb" << " Indisponivel ate o fim do processo atual...\n\n";
+					isProcessoAlocado[w] = false;
+				}
+			}
+			system("PAUSE");
+			system("CLS");
+		}
+	}
+	
+void worst_Fit(int particoesMemoria[], int processo[], int tamanhoMemoriaParticao, int quantidadeProcesso){
+		
+	/*  Bloco responsavel por armazenar se a particao de particoesMemoria esta sendo utilizada por 
+		um processo ou nao.*/
+	
+	bool isProcessoAlocado[tamanhoMemoriaParticao];		
+	for(int i = 0; i < tamanhoMemoriaParticao; i++){
+		isProcessoAlocado[i] = true;
+	}
+	
+	/*
+		For J diz a respeito dos processo
+		For I-1 diz a respeito das memorias
+		variavel processoAlocado salva se o processo é maior do que qualquer espaco na particoesMemoria
+		*/
+		
+				
+	for(int j = 0; j < quantidadeProcesso; j++){
+		list<int> listaOrganizadora;
+		int aux = 0;
+		bool processoAlocado = false;
+		
+		for(int i = 0; i < tamanhoMemoriaParticao; i++){
+			
+			if(processo[j] > particoesMemoria[i]){
+				aux++;
+			}
+			
+			if(particoesMemoria[i] >= processo[j] && isProcessoAlocado[i] == true){
+					listaOrganizadora.push_front(particoesMemoria[i]);
+				}
+			}
+			
+			if(aux == tamanhoMemoriaParticao){
+				processoAlocado = true;
+			}
+			
+		int higherValue = listaOrganizadora.front();
+		int vetorOrganizador[listaOrganizadora.size()];
+		int auxiliarIterator = 0;
+		
+		
+		if(processoAlocado == false){
+		cout << "============= Processo >> " << processo[j] << " << Opcoes de particoes abaixo =============";
+		
+		
+		//Bloco responsavel por pegar o maior valor que o bloco perde ao processo entrar.				
+		for (list<int>::iterator it = listaOrganizadora.begin(); it != listaOrganizadora.end(); it++) {
+        	vetorOrganizador[auxiliarIterator] = *it;
+        	auxiliarIterator++;
+			
+        	if(higherValue < *it){
+        		higherValue = *it;
+			}
+    	}
+    	
+		cout << "\n";
+		
+		for(int i = 0; i < listaOrganizadora.size(); i++){
+    		cout << " " << vetorOrganizador[i] << endl;
+		}
+    	
+    			cout << "=========================================================================" << endl;
+    		
+				cout << "\n     " << "Processo: " << processo[j] << " --> " << higherValue;
+				cout << "\n" << endl;	
+			}else{
+				cout << "\n   <<< ERROR: Processo { " << processo[j] << " } maior que qualquer unidade de particao >>>";
+				cout << "\n" << endl;	
+			}
+			
+			for(int w = 0; w < tamanhoMemoriaParticao; w++){
+			
+				if(higherValue == particoesMemoria[w] && isProcessoAlocado[w] == true){
+					cout << "     Particao: " << particoesMemoria[w] << "kb" << " Indisponivel ate o fim do processo atual...\n\n";
+					isProcessoAlocado[w] = false;
+				}
+			}
+					
+			system("PAUSE");
+			system("CLS");
+		}
+	}
+
+int main(int argc, char *argv[]){
+    
+    /*	Etapa 1
+    	- Teste do enunciado: 8 particoes -> 1550 1210 908 714 1850 2000 400 1090.
+    */
+    
+    cout << "Especifique a quantidade de particoes: ";
+    int quantidadeParticoes = 0;
+    cin >> quantidadeParticoes;
+    
+    int memoriaPaticoes[quantidadeParticoes];
+    
+    cout << "Liste, tamanho de cada particao: ";
+    
+    for(int i = 0; i < quantidadeParticoes; i++){
+            cin >> memoriaPaticoes[i];
+    }
+    
+    /*	Etapa 2
+        - Teste do enunciado: 3 processo -> 1350 380 960.
+	*/
+	
+	cout << "Especifique a quantidade de processos: ";
+    int quantidadeProcessos = 0;
+    cin >> quantidadeProcessos;
+    
+    int tamanhoProcesso[quantidadeProcessos];
+    
+    cout << "Liste, tamanho de cada processo: ";
+    
+    for(int i = 0; i < 3; i++){
+         	cin >> tamanhoProcesso[i];
+    }
+    
+    /*	Etapa 3
+    	- First Fit, Best Fit, Worst Fit.
+	*/
+
+	cout << "\n1 - First Fit\n2 - Best Fit\n3 - Worst Fit" << endl;
+	cout << " > ";
+	int escolha = 0;
+	cin >> escolha;
+	
+	cout << "\n";
+	
+	switch(escolha){
+		case 1:
+			system("CLS");
+			first_Fit(memoriaPaticoes, tamanhoProcesso, quantidadeParticoes, quantidadeProcessos);
+			break;
+			
+		case 2:
+			system("CLS");
+			best_Fit(memoriaPaticoes, tamanhoProcesso, quantidadeParticoes, quantidadeProcessos);
+			break;
+			
+		case 3:
+			system("CLS");
+			worst_Fit(memoriaPaticoes, tamanhoProcesso, quantidadeParticoes, quantidadeProcessos);
+			break;
+		default:
+			system("CLS");
+			puts("*Servico invalido*");			
+	}
+    
+     
+    system("ECHO desenvolvido por: Guilherme Correia");
+    system("PAUSE");
+    return EXIT_SUCCESS;
+}
