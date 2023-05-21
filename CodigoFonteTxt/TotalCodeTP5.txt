@@ -1,0 +1,269 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+#include "Categoria.h"
+using namespace std;
+
+
+void atualizarCategoria(int totalPages, string pagina[], vector<string>& classe0, vector<string>& classe1, vector<string>& classe2, vector<string>& classe3, bool R[], bool M[]) {
+	for(int i = 0; i < totalPages; i++){
+		if(M[i] == 0 && R[i] == 0)
+			classe0.push_back(pagina[i]);
+		else if(M[i] == 0 && R[i] == 1)
+			classe1.push_back(pagina[i]);
+		else if(M[i] == 1 && R[i] == 0)
+			classe2.push_back(pagina[i]);
+		else
+			classe3.push_back(pagina[i]);
+	}
+}
+
+int lowestPriorityChoice(vector<string> classe0, vector<string> classe1, vector<string> classe2, vector<string> classe3){
+	if(!classe0.empty()){
+	    return rand()%(classe0.size());
+	}
+	else if(!classe1.empty()){
+	    return rand()%(classe1.size());
+	}
+	else if(!classe2.empty()){
+	    return rand()%(classe2.size());
+	}
+	else{
+	    return rand()%(classe3.size());
+	}
+}
+
+int lowestPriority(vector<string> classe0, vector<string> classe1, vector<string> classe2, vector<string> classe3){
+	if(!classe0.empty()){
+		return 0;
+	}
+	else if(!classe1.empty()){
+		return 1;
+	}
+	else if(!classe2.empty()){
+	    return 2;
+	}
+	else{
+	    return 3;
+	}
+}
+
+void NUR(int totalPages){
+	
+	/*  totalPages eh a requisicao do usuario
+		vetor pagina eh o vetor da requisicao
+		R eh a referencia da pagina, M eh a modificacao da pagina		
+	*/
+	
+	string pagina[totalPages]; 
+	bool R[totalPages];
+	bool M[totalPages];
+	
+	/*  R e M começam zerados
+		Usando for para zerar eles desde o inicio e nomear totalPages
+	*/
+	
+	cout << "\n- Write the name of pages -" << endl;
+	
+	for(int i = 0; i < totalPages; i++){
+		cout << "> ";
+		cin >> pagina[i];
+		R[i] = 0;
+		M[i] = 0;
+	}
+	
+	cout << "\n- Write the Reference/Modification (0 or 1) of pages -" << endl;
+	
+	/* for' Informando se o processo foi modificado ou referenciado, as entradas aceitaveis sao apenas 0 e 1 para 
+		modificado e nao modificado e referenciado e nao referenciado	
+	*/
+	
+	for(int i = 0; i < totalPages; i++){
+		cout << pagina[i] << " {" << (i + 1) << "} [M][R]? > ";
+		cin >> M[i];
+		cin >> R[i];
+	}
+	
+	//Criacao de categorias e Varredura para encaixar as paginas em cada categoria.
+	vector <string> classe0;
+	vector <string> classe1;
+	vector <string> classe2;
+	vector <string> classe3;
+	
+	//Atualizar categorias
+	
+	atualizarCategoria(totalPages, pagina, classe0, classe1, classe2, classe3, R, M);
+	
+	for(int i = 0; i < classe0.size(); i++){
+		cout << "Categoria 0 {" << classe0[i] << "} M/R {" << M[i] << ", " << R[i] << "}" << endl;
+	}
+	
+		for(int i = 0; i < classe1.size(); i++){
+		cout << "Categoria 1 {" << classe1[i] << "} M/R {" << M[i] << ", " << R[i] << "}" << endl;
+	}
+	
+		for(int i = 0; i < classe2.size(); i++){
+		cout << "Categoria 2 {" << classe2[i] << "} M/R {" << M[i] << ", " << R[i] << "}" << endl;
+	}
+	
+		for(int i = 0; i < classe3.size(); i++){
+		cout << "Categoria 3 {" << classe3[i] << "} M/R {" << M[i] << ", " << R[i] << "}" << endl;
+	}
+	/* 	
+		Criacao do processo que vai "Roubar o lugar" do processo que sair da memoria ram para disco (Swap-out)
+		Logo depois o processo que saiu vai tentar voltar para o mesmo lugar da memoria (Swap-in) e acontecera uma simulacao de
+		page fault
+	*/
+	string swapInPage = "Processo Exemplo";
+	/*
+		Pagina Guilherme.com quer entrar na memoria, bloco abaixo escolhe a opcao com menor prioridade.
+		sendo que a categoria tem que ser a menor possivel, se tiver paginas, dentro da categoria a pagina e' escolhida aleatoriamente
+		qual pagina vai para swap-out
+		
+		metodo lowest retorna INT dizendo qual categoria deve ser usada
+		
+		depois de escolhida a categoria e pagina com menor prioridade, swapInPage entra no lugar.
+	*/
+	
+	int swaPosition = lowestPriorityChoice(classe0, classe1, classe2, classe3); //posicao do valor menor prioridade dentro da categoria.
+	string swapExample; // recebe o nome da pagina do menor valor
+	
+	if(lowestPriority(classe0, classe1, classe2, classe3) == 0){
+		cout << "\n-\nPagina para Swap-out: " << classe0[swaPosition] << endl;
+ 		swapExample = classe0[swaPosition];
+		classe0[swaPosition] = swapInPage;
+	}
+	else if(lowestPriority(classe0, classe1, classe2, classe3) == 1){
+		cout << "\n-\nPagina para Swap-out: " << classe1[swaPosition] << endl;
+ 		swapExample = classe1[swaPosition];
+		classe1[swaPosition] = swapInPage;
+	}
+	else if(lowestPriority(classe0, classe1, classe2, classe3) == 2){
+		cout << "\n-\nPagina para Swap-out: " << classe2[swaPosition] << endl;
+ 		swapExample = classe2[swaPosition];
+		classe2[swaPosition] = swapInPage;
+	}
+	else{
+		cout << "\n-\nPagina para Swap-out: " << classe3[swaPosition] << endl;
+ 		swapExample = classe3[swaPosition];
+		classe3[swaPosition] = swapInPage;
+	}
+	
+	cout << "\n{" << swapInPage << "} passa a ocupar o local da pagina {" << swapExample << "}\n-\n" << endl;
+	bool teste = false;
+	
+	for(int i = 0; i < totalPages; i++){
+		if(pagina[i] == swapExample){
+			pagina[i] = swapInPage;
+			cout << "{" << swapInPage << "} Modificacao 1/0: ";
+			cin >> M[i]; //muda o M da pagina em especifico que ocupou o local da pagina.
+			teste = M[i];
+		}
+	}
+	
+	atualizarCategoria(totalPages, pagina, classe0, classe1, classe2, classe3, R, M);
+	
+	system("PAUSE");
+	system("CLS");
+	
+	cout << "*** Memoria ***\n" << endl;
+	for(int i = 0; i < totalPages; i++){
+		if(swapExample == pagina[i]){
+			pagina[i] = swapInPage;
+		}
+		cout << pagina[i] << " {" << (i + 1) << "} [M][R] > " << M[i] << " " << R[i] << endl;
+	}
+	
+	cout << "\n{" << swapInPage << "} continua na memoria?\n" << endl;
+	cout << "0 - NAO\n1 - SIM\n" << endl;
+	cout << "> ";
+	bool noYes;
+	cin >> noYes;
+	
+	int aleatorio = 0;
+	
+	if(noYes){
+	    cout << "{" << swapExample << "} quer Swap-in.\n Pagina{" << swapInPage << "} esta ocupando o endereco de memoria..." << endl;
+	    R[teste] = 1;
+	    cout << "\nProcurando outro endereco de memoria..." << endl;
+	    
+	    if(!classe0.empty()){
+	    	cout << "Substitucao feita na Categoria '0'" << endl;
+	        aleatorio = rand()%classe0.size();
+	        cout << " {" <<swapExample << "} Entra no lugar de: {" << classe0[aleatorio] << "} " << endl;
+	        classe0[aleatorio] = swapExample;
+	    }
+	    else if(!classe1.empty()){
+	    	cout << "Substitucao feita na Categoria '1'" << endl;
+	        aleatorio = rand()%classe1.size();
+	        classe1[aleatorio] = swapExample;
+	    }
+	    else if(!classe2.empty()){
+	    	cout << "Substitucao feita na Categoria '2'" << endl;
+	        aleatorio = rand()%classe2.size();
+	        classe2[aleatorio] = swapExample;
+	    }
+	    else{
+	    	
+	    	cout << "Substitucao feita na Categoria '3'" << endl;
+	        aleatorio = rand()%classe3.size();
+	        classe3[aleatorio] = swapExample;
+	    }
+	}
+	else{
+	    if(teste){
+	        cout << " {" << swapInPage << "} alterou a pagina: Disk Write completo e substituicao feita." << endl;
+	        	if(lowestPriority(classe0, classe1, classe2, classe3) == 0){
+					classe0[swaPosition] = swapExample;
+				}
+				else if(lowestPriority(classe0, classe1, classe2, classe3) == 1){
+				classe1[swaPosition] = swapExample;
+				}
+				else if(lowestPriority(classe0, classe1, classe2, classe3) == 2){
+				classe2[swaPosition] = swapExample;
+				}
+				else{
+				classe3[swaPosition] = swapExample;
+				}
+				
+	        M[teste] = 0;
+	        R[teste] = 0;
+	    }
+	    else{
+	        cout << "Pagina nao modificada, substituicao feita." << endl;
+	        if(lowestPriority(classe0, classe1, classe2, classe3) == 0){
+					classe0[swaPosition] = swapExample;
+				}
+				else if(lowestPriority(classe0, classe1, classe2, classe3) == 1){
+				classe1[swaPosition] = swapExample;
+				}
+				else if(lowestPriority(classe0, classe1, classe2, classe3) == 2){
+				classe2[swaPosition] = swapExample;
+				}
+				else{
+				classe3[swaPosition] = swapExample;
+				}
+	        cout << "*** Memoria ***\n" << endl;
+			for(int i = 0; i < totalPages; i++){
+			if(pagina[i] == swapInPage){
+			pagina[i] = swapExample;
+			M[i] = 0;
+	        R[i] = 0;
+			}
+			cout << pagina[i] << " {" << (i + 1) << "} [M][R] > " << M[i] << " " << R[i] << endl;
+			}
+	    }
+	}
+	atualizarCategoria(totalPages, pagina, classe0, classe1, classe2, classe3, R, M);
+}
+
+int main(int argc, char** argv) {
+	srand(time(NULL));
+	
+	int totalPages = 0;
+	cout << "Enter the total number of pages: ";
+	cin >> totalPages;
+	NUR(totalPages);
+	return 0;
+}
