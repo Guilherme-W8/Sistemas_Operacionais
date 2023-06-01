@@ -1,0 +1,28 @@
+#include <cstdlib>
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int main(int argc, char *argv[]) {
+    queue<int> fifoQueue; // Cria uma fila vazia
+
+    // Adiciona elementos à fila
+    fifoQueue.push(1);
+    fifoQueue.push(2);
+    fifoQueue.push(3);
+    fifoQueue.push(4);
+    fifoQueue.push(5);
+
+    // Remove e exibe os elementos da fila na ordem em que foram adicionados
+    while (!fifoQueue.empty()) {
+        int frontElement = fifoQueue.front(); // Obtém o elemento da frente da fila
+        fifoQueue.pop(); // Remove o elemento da frente
+        cout << frontElement << " "; // Exibe o elemento
+    }
+
+    cout << endl;
+    
+    system("PAUSE");
+    return EXIT_SUCCESS;
+}
