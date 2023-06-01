@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+struct Pagina {
+    int id;
+    bool referencia;
+};
+
+int Clock(vector<Pagina>& paginas, int numFrames) {
+    int numPaginas = paginas.size();
+    vector<Pagina*> frames(numFrames, nullptr); // Vetor para armazenar os frames
+    int pointer = 0; // Ponteiro para o próximo frame a ser considerado
+    int pageFaults = 0;
+
+    for (int i = 0; i < numPaginas; i++) {
+        Pagina& paginaAtual = paginas[i];
+
+        // Verifica se a página já está presente nos frames
+        auto it = find_if(frames.begin(), frames.end(), [&paginaAtual](Pagina* p) {
+            return p != nullptr && p->id == paginaAtual.id;
+        });
+
+        if (it != frames.end()) {
+            (*it)->referencia = true; // Atualiza a flag de referência
+        } else {
+            // Procura um frame vazio ou um frame com a flag de referência desligada
+            while (frames[pointer] != nullptr && frames[pointer]->referencia) {
+                frames[pointer]->referencia = false; // Desliga a flag de referência
+                pointer = (pointer + 1) % numFrames; // Move o ponteiro para o próximo frame
+            }
+
+            // Substitui a página no frame atual
+            frames[pointer] = &paginaAtual;
+            paginaAtual.referencia = true; // Atualiza a flag de referência
+            pointer = (pointer + 1) % numFrames; // Move o ponteiro para o próximo frame
+            pageFaults++;
+        }
+    }
+
+    return pageFaults;
+}
+
+int main(int argc, char *argv[]) {
+    int numFrames, numPaginas;
+    cout << "Informe o número de frames: ";
+    cin >> numFrames;
+    cout << "Informe o número de páginas: ";
+    cin >> numPaginas;
+
+    vector<Pagina> paginas(numPaginas);
+    cout << "Informe as páginas: ";
+    for (int i = 0; i < numPaginas; i++) {
+        cin >> paginas[i].id;
+        paginas[i].referencia = false;
+    }
+
+    int pageFaults = Clock(paginas, numFrames);
+
+    cout << "Número de page faults: " << pageFaults << endl;
+
+	system("PAUSE");
+    return EXIT_SUCCESS;
+}

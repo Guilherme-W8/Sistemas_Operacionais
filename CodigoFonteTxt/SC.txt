@@ -1,0 +1,72 @@
+#include <iostream>
+#include <list>
+#include <unordered_map>
+
+using namespace std;
+
+struct Pagina {
+    int id;
+    bool referenciada;
+};
+
+int SecondChance(list<Pagina>& paginas, int numFrames) {
+    int numPaginas = paginas.size();
+    unordered_map<int, list<Pagina>::iterator> frameMap; // Mapeamento entre id da página e iterator na lista de páginas
+    list<Pagina> frames; // Lista para armazenar os frames
+    int pageFaults = 0;
+
+    for (int i = 0; i < numPaginas; i++) {
+        Pagina& paginaAtual = paginas.front();
+        paginas.pop_front();
+
+        // Verifica se a página já está presente nos frames
+        if (frameMap.find(paginaAtual.id) != frameMap.end()) {
+            frameMap[paginaAtual.id]->referenciada = true; // Atualiza a flag de referência
+        } else {
+            // Procura um frame vazio ou um frame com a flag de referência desligada
+            while (!frames.empty() && (frames.front().referenciada)) {
+                frames.front().referenciada = false; // Desliga a flag de referência
+                frames.push_back(frames.front()); // Move a página para o final da lista
+                frames.pop_front(); // Remove a página do início da lista
+            }
+
+            if (frames.size() == numFrames) {
+                frameMap.erase(frames.front().id); // Remove a página do mapeamento
+                frames.pop_front(); // Remove a página do início da lista
+            }
+
+            frames.push_back(paginaAtual); // Adiciona a página no final da lista
+            frameMap[paginaAtual.id] = prev(frames.end()); // Insere o mapeamento para a página atual
+            paginaAtual.referenciada = true; // Atualiza a flag de referência
+            pageFaults++;
+        }
+
+        paginas.push_back(paginaAtual); // Insere a página de volta no final da lista
+    }
+
+    return pageFaults;
+}
+
+int main(int argc, char *argv[]) {
+    int numFrames, numPaginas;
+    cout << "Informe o número de frames: ";
+    cin >> numFrames;
+    cout << "Informe o número de páginas: ";
+    cin >> numPaginas;
+
+    list<Pagina> paginas;
+    cout << "Informe as páginas: ";
+    for (int i = 0; i < numPaginas; i++) {
+        Pagina pagina;
+        cin >> pagina.id;
+        pagina.referenciada = false;
+        paginas.push_back(pagina);
+    }
+
+    int pageFaults = SecondChance(paginas, numFrames);
+
+    cout << "Número de page faults: " << pageFaults << endl;
+
+	system("PAUSE");
+    return EXIT_SUCCESS;
+}

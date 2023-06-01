@@ -1,0 +1,54 @@
+#include <cstdlib>
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+int MRU(int* paginas, int numPaginas, int numFrames) {
+    int frames[numFrames];
+    int timestampUso[numFrames];
+    fill_n(frames, numFrames, -1); // Preenche o array de frames com -1
+    fill_n(timestampUso, numFrames, 0); // Preenche o array de timestamps de uso com 0
+    int pageFaults = 0;
+
+    for (int i = 0; i < numPaginas; i++) {
+        int paginaAtual = paginas[i];
+        int* it = find(frames, frames + numFrames, paginaAtual);
+
+        if (it != frames + numFrames) {
+            int indice = distance(frames, it);
+            timestampUso[indice] = i; // Atualiza o timestamp de uso
+        } else {
+            int* elementoMaxTimestamp = max_element(timestampUso, timestampUso + numFrames);
+            int indiceMaxTimestamp = distance(timestampUso, elementoMaxTimestamp);
+            frames[indiceMaxTimestamp] = paginaAtual; // Substitui o frame com maior timestamp de uso
+            timestampUso[indiceMaxTimestamp] = i; // Atualiza o timestamp de uso
+            pageFaults++;
+        }
+    }
+
+    return pageFaults;
+}
+
+int main(int argc, char *argv[]) {
+    int numFrames, numPaginas;
+    cout << "Informe o número de frames: ";
+    cin >> numFrames;
+    cout << "Informe o número de páginas: ";
+    cin >> numPaginas;
+
+    int* paginas = new int[numPaginas];
+    cout << "Informe as páginas: ";
+    for (int i = 0; i < numPaginas; i++) {
+        cin >> paginas[i];
+    }
+
+    int pageFaults = MRU(paginas, numPaginas, numFrames);
+
+    cout << "Número de page faults: " << pageFaults << endl;
+
+    delete[] paginas;	
+	
+	system("PAUSE");
+    return EXIT_SUCCESS;
+}
